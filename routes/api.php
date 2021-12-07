@@ -3,10 +3,12 @@
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Orion\Facades\Orion;
+use App\Cart;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +22,9 @@ use Orion\Facades\Orion;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+	$user = $request->user();
+	$user->cart = $user->cart();
+    return $user;
 });
 
 // Route::middleware("auth:sanctum")->get('/produk', [ProdukController::class, "show"]);
@@ -31,4 +35,10 @@ Route::middleware('auth:sanctum')->post('/user/reset-password', [UserController:
 
 Route::group(['as' => 'api.', 'middleware' => 'auth:sanctum'], function () {
     Orion::resource('produk', ProdukController::class);
+    Orion::resource('cart', CartController::class)->withSoftDeletes();
 });
+
+Route::middleware('auth:sanctum')->post('/cart/delete/{cart}', function(Cart $cart) {
+	dd($cart);
+});
+
